@@ -3,7 +3,8 @@
   <entry>
     <title>Redis缓存穿透-布隆过滤器</title>
     <url>/2024/10/20/BloomFilter/</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<p>努力中。。。。</p>
+]]></content>
       <tags>
         <tag>redis</tag>
         <tag>缓存问题</tag>
@@ -57,7 +58,7 @@
 <li><strong>缺点</strong>：额外消耗内存（针对这个问题一般会设置一个较短的过期时间 TTL）。</li>
 </ul>
 </li>
-<li><p><strong><a href="/path/to/BloomFilter.html">布隆过滤器</a></strong></p>
+<li><p><strong><a href="https://lualvis.github.io/2024/10/20/BloomFilter/">布隆过滤器</a></strong></p>
 <ul>
 <li>通过使用布隆过滤器，可以在请求到达数据库之前先检查请求的数据是否存在于数据库中，减少无效请求对数据库的压力。</li>
 <li><strong>优点</strong>：内存占用少，没有多余key</li>
