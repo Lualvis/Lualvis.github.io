@@ -78,7 +78,7 @@
   </entry>
   <entry>
     <title>线程创建的几种方式</title>
-    <url>/2023/09/07/CreateThread/</url>
+    <url>/2025/02/05/CreateThread/</url>
     <content><![CDATA[<h1 id="线程创建的几种方式"><a href="#线程创建的几种方式" class="headerlink" title="线程创建的几种方式"></a>线程创建的几种方式</h1><h2 id="1-继承Thread类"><a href="#1-继承Thread类" class="headerlink" title="1.继承Thread类"></a><strong>1.继承Thread类</strong></h2><p>最为简单直接的方式，直接通过继承<code>Thread</code>类，并重写<code>run()</code>方法。</p>
 <p><strong>步骤：</strong></p>
 <ol>
