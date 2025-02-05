@@ -77,6 +77,91 @@
       </tags>
   </entry>
   <entry>
+    <title>线程创建的几种方式</title>
+    <url>/2023/09/07/CreateThread/</url>
+    <content><![CDATA[<h1 id="线程创建的几种方式"><a href="#线程创建的几种方式" class="headerlink" title="线程创建的几种方式"></a>线程创建的几种方式</h1><h2 id="1-继承Thread类"><a href="#1-继承Thread类" class="headerlink" title="1.继承Thread类"></a><strong>1.继承Thread类</strong></h2><p>最为简单直接的方式，直接通过继承<code>Thread</code>类，并重写<code>run()</code>方法。</p>
+<p><strong>步骤：</strong></p>
+<ol>
+<li><p>创建一个类继承<code>Thread</code>。</p>
+</li>
+<li><p>重写 <code>run()</code> 方法，将线程要执行的的代码写在<code>run</code>方法中。</p>
+</li>
+<li><p>创建线程对象，通过<code>start()</code>方法启动线程。</p>
+</li>
+</ol>
+<p><strong>示例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Thread is running&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyThread</span> <span class="variable">myThread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyThread</span>();</span><br><span class="line">        myThread.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点：</strong></p>
+<ul>
+<li><p>简单直接，适合快速创建简单线程。</p>
+</li>
+<li><p>由于<code>Java</code>不支持多继承，如果已经继承了其他类，就不能使用这种方式。</p>
+</li>
+</ul>
+<h2 id="2-实现Runnable接口"><a href="#2-实现Runnable接口" class="headerlink" title="2.实现Runnable接口"></a>2.实现Runnable接口</h2><p>相比于继承<code>Thread</code>，实现<code>Runnable</code>接口更为灵活，可以避免<code>java</code>单继承的限制</p>
+<p><strong>步骤：</strong></p>
+<ol>
+<li><p>创建一个类实现<code>Runnable</code>接口。</p>
+</li>
+<li><p>实现 <code>run()</code> 方法，将线程要执行的的代码写在<code>run</code>方法中。</p>
+</li>
+<li><p>创建<code>Thread</code>对象，并将<code>Runnable</code>对象传递给<code>Thread</code>的构造方法。</p>
+</li>
+<li><p>调用<code>start()</code>方法启动线程。</p>
+</li>
+</ol>
+<p><strong>示例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyRunnable</span> <span class="keyword">implements</span> <span class="title class_">Runnable</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Runnable is running&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyRunnable</span> <span class="variable">runnable</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyRunnable</span>();</span><br><span class="line">        <span class="type">Thread</span> <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(runnable);</span><br><span class="line">        thread.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点：</strong></p>
+<ul>
+<li><p>更灵活，可以实现 <code>Runnable</code> 接口的同时继承其他类。</p>
+</li>
+<li><p>更加适合资源共享场景，可以将同一个 <code>Runnable</code> 实例传递给多个线程。</p>
+</li>
+</ul>
+<h2 id="3-使用callable和Future"><a href="#3-使用callable和Future" class="headerlink" title="3.使用callable和Future"></a>3.使用callable和Future</h2><p><code>Callable</code> 和 <code>Runnable</code> 类似，但 <code>Callable</code> 可以有返回值，并且可以抛出异常。需要配合 <code>Future</code> 或 <code>FutureTask</code> 使用。</p>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>创建一个类实现<code>Callable</code> 接口。</li>
+<li>实现<code>call()</code>方法 ,并定义返回值类型</li>
+<li>使用<code>ExecutorService</code>提交任务，获得<code>Future</code>对象</li>
+<li>通过<code>Future</code>的<code>get()</code>方法获得线程结果。</li>
+</ol>
+<p><strong>示例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyCallable</span> <span class="keyword">implements</span> <span class="title class_">Callable</span>&lt;Integer&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">123</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newSingleThreadExecutor();</span><br><span class="line">        Future&lt;Integer&gt; future = executor.submit(<span class="keyword">new</span> <span class="title class_">MyCallable</span>());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;callable返回值：&quot;</span> + future.get());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        executor.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点：</strong></p>
+<ul>
+<li>可以获取线程的执行结果。</li>
+<li>支持抛出异常的处理。</li>
+<li>更加适合复杂的线程操作，特别是需要返回结果时。</li>
+</ul>
+<h2 id="4-使用线程池（ExecutorService"><a href="#4-使用线程池（ExecutorService" class="headerlink" title="4.使用线程池（ExecutorService)"></a>4.使用线程池（ExecutorService)</h2><p>线程池管理一组线程，可以避免频繁创建和销毁线程的开销，提高性能。</p>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>创建一个线程池，例如使用 <code>Executors</code> 类。</li>
+<li>将任务提交给线程池执行。</li>
+<li>线程池可以管理多个线程的执行，并可复用现有线程。</li>
+</ol>
+<p><strong>示例：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newFixedThreadPool(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            executor.submit(() -&gt; &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Thread &quot;</span> + Thread.currentThread().getName() + <span class="string">&quot; is running&quot;</span>);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        executor.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点：</strong></p>
+<ul>
+<li>提高了资源利用率，特别适合大量短小任务的执行。</li>
+<li>可以控制线程的数量，避免过多线程导致的资源竞争。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Thread</category>
+      </categories>
+      <tags>
+        <tag>Thread</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Redis 常见使用场景与缓存问题</title>
     <url>/2024/10/20/redis/</url>
     <content><![CDATA[<p>Redis 是一个开源的的内存数据结构存储系统，常用作数据库、缓存和消息代理。它支持多种数据结构，如字符串、哈希、列表、集合等，具备高性能和灵活性。</p>
@@ -175,91 +260,6 @@
       <tags>
         <tag>redis</tag>
         <tag>缓存问题</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>线程创建的几种方式</title>
-    <url>/2023/09/07/CreateThread/</url>
-    <content><![CDATA[<h1 id="线程创建的几种方式"><a href="#线程创建的几种方式" class="headerlink" title="线程创建的几种方式"></a>线程创建的几种方式</h1><h2 id="1-继承Thread类"><a href="#1-继承Thread类" class="headerlink" title="1.继承Thread类"></a><strong>1.继承Thread类</strong></h2><p>最为简单直接的方式，直接通过继承<code>Thread</code>类，并重写<code>run()</code>方法。</p>
-<p><strong>步骤：</strong></p>
-<ol>
-<li><p>创建一个类继承<code>Thread</code>。</p>
-</li>
-<li><p>重写 <code>run()</code> 方法，将线程要执行的的代码写在<code>run</code>方法中。</p>
-</li>
-<li><p>创建线程对象，通过<code>start()</code>方法启动线程。</p>
-</li>
-</ol>
-<p><strong>示例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyThread</span> <span class="keyword">extends</span> <span class="title class_">Thread</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Thread is running&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyThread</span> <span class="variable">myThread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyThread</span>();</span><br><span class="line">        myThread.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong></p>
-<ul>
-<li><p>简单直接，适合快速创建简单线程。</p>
-</li>
-<li><p>由于<code>Java</code>不支持多继承，如果已经继承了其他类，就不能使用这种方式。</p>
-</li>
-</ul>
-<h2 id="2-实现Runnable接口"><a href="#2-实现Runnable接口" class="headerlink" title="2.实现Runnable接口"></a>2.实现Runnable接口</h2><p>相比于继承<code>Thread</code>，实现<code>Runnable</code>接口更为灵活，可以避免<code>java</code>单继承的限制</p>
-<p><strong>步骤：</strong></p>
-<ol>
-<li><p>创建一个类实现<code>Runnable</code>接口。</p>
-</li>
-<li><p>实现 <code>run()</code> 方法，将线程要执行的的代码写在<code>run</code>方法中。</p>
-</li>
-<li><p>创建<code>Thread</code>对象，并将<code>Runnable</code>对象传递给<code>Thread</code>的构造方法。</p>
-</li>
-<li><p>调用<code>start()</code>方法启动线程。</p>
-</li>
-</ol>
-<p><strong>示例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyRunnable</span> <span class="keyword">implements</span> <span class="title class_">Runnable</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Runnable is running&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">MyRunnable</span> <span class="variable">runnable</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyRunnable</span>();</span><br><span class="line">        <span class="type">Thread</span> <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(runnable);</span><br><span class="line">        thread.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong></p>
-<ul>
-<li><p>更灵活，可以实现 <code>Runnable</code> 接口的同时继承其他类。</p>
-</li>
-<li><p>更加适合资源共享场景，可以将同一个 <code>Runnable</code> 实例传递给多个线程。</p>
-</li>
-</ul>
-<h2 id="3-使用callable和Future"><a href="#3-使用callable和Future" class="headerlink" title="3.使用callable和Future"></a>3.使用callable和Future</h2><p><code>Callable</code> 和 <code>Runnable</code> 类似，但 <code>Callable</code> 可以有返回值，并且可以抛出异常。需要配合 <code>Future</code> 或 <code>FutureTask</code> 使用。</p>
-<p><strong>步骤：</strong></p>
-<ol>
-<li>创建一个类实现<code>Callable</code> 接口。</li>
-<li>实现<code>call()</code>方法 ,并定义返回值类型</li>
-<li>使用<code>ExecutorService</code>提交任务，获得<code>Future</code>对象</li>
-<li>通过<code>Future</code>的<code>get()</code>方法获得线程结果。</li>
-</ol>
-<p><strong>示例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyCallable</span> <span class="keyword">implements</span> <span class="title class_">Callable</span>&lt;Integer&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">123</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newSingleThreadExecutor();</span><br><span class="line">        Future&lt;Integer&gt; future = executor.submit(<span class="keyword">new</span> <span class="title class_">MyCallable</span>());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;callable返回值：&quot;</span> + future.get());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        executor.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong></p>
-<ul>
-<li>可以获取线程的执行结果。</li>
-<li>支持抛出异常的处理。</li>
-<li>更加适合复杂的线程操作，特别是需要返回结果时。</li>
-</ul>
-<h2 id="4-使用线程池（ExecutorService"><a href="#4-使用线程池（ExecutorService" class="headerlink" title="4.使用线程池（ExecutorService)"></a>4.使用线程池（ExecutorService)</h2><p>线程池管理一组线程，可以避免频繁创建和销毁线程的开销，提高性能。</p>
-<p><strong>步骤：</strong></p>
-<ol>
-<li>创建一个线程池，例如使用 <code>Executors</code> 类。</li>
-<li>将任务提交给线程池执行。</li>
-<li>线程池可以管理多个线程的执行，并可复用现有线程。</li>
-</ol>
-<p><strong>示例：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newFixedThreadPool(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            executor.submit(() -&gt; &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Thread &quot;</span> + Thread.currentThread().getName() + <span class="string">&quot; is running&quot;</span>);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        executor.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong></p>
-<ul>
-<li>提高了资源利用率，特别适合大量短小任务的执行。</li>
-<li>可以控制线程的数量，避免过多线程导致的资源竞争。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Thread</category>
-      </categories>
-      <tags>
-        <tag>Thread</tag>
       </tags>
   </entry>
 </search>
