@@ -1,0 +1,309 @@
+<!DOCTYPE html><html lang="[&quot;zh-CN&quot;,&quot;en&quot;,&quot;default&quot;]" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>红黑树 | Luyseon Blog</title><meta name="author" content="Luyseon"><meta name="copyright" content="Luyseon"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="referrer" content="no-referrer"><meta name="description" content="红黑树R-B Tree，全称Red-Black Tree，又称红黑树，一种特殊的二叉平衡树。它通过引入颜色标记和一系列约束规则，保证了树的插入、删除等操作后的平衡性，从而使得查找、插入、删除的时间复杂度均保持在O(log n)范围内。 1.前提知识在了解红黑树之前，我们先得了解BST二叉查找树和AVL平衡二叉树的一些基本概念。 1.1.BST二叉查找树什么是二叉查找树 二叉查找树(BST) 又叫二">
+<meta property="og:type" content="article">
+<meta property="og:title" content="红黑树">
+<meta property="og:url" content="https://lualvis.github.io/2025/04/21/RB-Tree/index.html">
+<meta property="og:site_name" content="Luyseon Blog">
+<meta property="og:description" content="红黑树R-B Tree，全称Red-Black Tree，又称红黑树，一种特殊的二叉平衡树。它通过引入颜色标记和一系列约束规则，保证了树的插入、删除等操作后的平衡性，从而使得查找、插入、删除的时间复杂度均保持在O(log n)范围内。 1.前提知识在了解红黑树之前，我们先得了解BST二叉查找树和AVL平衡二叉树的一些基本概念。 1.1.BST二叉查找树什么是二叉查找树 二叉查找树(BST) 又叫二">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lualvis.github.io/img/avatar.png">
+<meta property="article:published_time" content="2025-04-21T09:09:47.055Z">
+<meta property="article:modified_time" content="2025-04-21T09:12:53.834Z">
+<meta property="article:author" content="Luyseon">
+<meta property="article:tag" content="Tree">
+<meta property="article:tag" content="AVL">
+<meta property="article:tag" content="R-B Tree">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lualvis.github.io/img/avatar.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lualvis.github.io/2025/04/21/RB-Tree/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '红黑树',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-04-21 17:12:53'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-info-circle"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/banner.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Luyseon Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">红黑树</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-info-circle"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">红黑树</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-21T09:09:47.055Z" title="发表于 2025-04-21 17:09:47">2025-04-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-21T09:12:53.834Z" title="更新于 2025-04-21 17:12:53">2025-04-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tree/">Tree</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h1><p><strong>R-B Tree</strong>，全称Red-Black Tree，又称<strong>红黑树</strong>，一种特殊的二叉平衡树。它通过引入颜色标记和一系列约束规则，保证了树的插入、删除等操作后的平衡性，从而使得查找、插入、删除的时间复杂度均保持在O(log n)范围内。</p>
+<h2 id="1-前提知识"><a href="#1-前提知识" class="headerlink" title="1.前提知识"></a>1.前提知识</h2><p>在了解红黑树之前，我们先得了解<strong>BST二叉查找树</strong>和<strong>AVL平衡二叉树</strong>的一些基本概念。</p>
+<h3 id="1-1-BST二叉查找树"><a href="#1-1-BST二叉查找树" class="headerlink" title="1.1.BST二叉查找树"></a>1.1.BST二叉查找树</h3><p><strong>什么是二叉查找树</strong></p>
+<p>二叉查找树(BST) 又叫<code>二叉搜索树</code>，它满足以下性质：</p>
+<ul>
+<li>若任意节点的左子树不为空，则左子树上所有的节点的值均小于它的根节点的值。</li>
+<li>若任意节点的右子树不为空，则右子树上所有的节点的值均大于它的根节点的值。</li>
+<li>任意节点的左、右子树也分别为二查找树。</li>
+</ul>
+<p><strong>二叉查找树的查找流程</strong></p>
+<p>在二叉查找树b中查找x的过程为：</p>
+<p>1.若b是空树，则查找失败，否则：</p>
+<p>2.若x等于b的根节点的数据域之值，则查找成功；否则：</p>
+<p>3.若x小于b的根节点的数据域之值，则查找左子树；否则：</p>
+<p>4.查找右子树。</p>
+<p><strong>示例代码</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Status <span class="title function_">SearchBST</span><span class="params">(BiTree T, KeyType key, BiTree f, BiTree &amp;p)</span> &#123;</span><br><span class="line">    <span class="comment">// 在根指针T所指二叉查找树中递归地查找其关键字等于key的数据元素，若查找成功，</span></span><br><span class="line">    <span class="comment">// 则指针p指向该数据元素指针，并返回TRUE，否则指针指向查找路径上访问的最后</span></span><br><span class="line">    <span class="comment">// 一个指针并返回FALSE，指针f指向T的双亲，其初始调用值为NULL</span></span><br><span class="line">    <span class="keyword">if</span> (!T) &#123; <span class="comment">// 查找不成功</span></span><br><span class="line">        p = f;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (key == T-&gt;data.key) &#123; <span class="comment">// 查找成功</span></span><br><span class="line">        p = T;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (key &lt; T-&gt;data.key) <span class="comment">// 在左子树中继续查找</span></span><br><span class="line">        <span class="keyword">return</span> SearchBST(T-&gt;lchild, key, T, p);</span><br><span class="line">    <span class="keyword">else</span> <span class="comment">// 在右子树中继续查找</span></span><br><span class="line">        <span class="keyword">return</span> SearchBST(T-&gt;rchild, key, T, p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>二叉查找树的极端情况</strong></p>
+<p>如果插入的数据是有序的或接近有序的（如从大到小依次插入），此时会导致树退化为链表结构，这个时候查询或写入耗时与链表相同，最坏情况的时间复杂度为O(n)。</p>
+<p><strong>退化成链表的BST：</strong></p>
+<img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250401220458.png" style="zoom: 80%;" />
+
+<p><strong>如何避免这种情况：</strong></p>
+<p>针对这种情况引入了平衡二叉树和红黑树，他们通过旋转等操作确保树的高度保持在O(log n)范围内，从而保证查找、插入和删除操作的时间复杂度为O(log n)。</p>
+<h3 id="1-2-AVL平衡二叉树"><a href="#1-2-AVL平衡二叉树" class="headerlink" title="1.2.AVL平衡二叉树"></a>1.2.AVL平衡二叉树</h3><p>平衡二叉树也加AVL，属于二叉查找树的一种，但是AVL通过机制保证了自身的平衡。在AVL树中，任一节点对应的两棵子树的最大高度差为1，因此他也被称为<strong>高度平衡树</strong>。查找、插入和删除在平均和最坏情况下的时间复杂度都是**O(log n)**。</p>
+<p>节点的<strong>平衡因子</strong>是它的左子树的高度减去它的右子树的高度（有时相反）。带有平衡因子1、0或 -1的节点被认为是平衡的。带有平衡因子 -2或2的节点被认为是不平衡的，并需要重新平衡这个树。平衡因子可以直接存储在每个节点中，或从可能存储在节点中的子树高度计算出来</p>
+<p><strong>特性：</strong></p>
+<ul>
+<li>对于任何一颗子树的root根节点而言，它的左子树任何节点的key一定比root小，而右子树任何节点的key一定比root大。</li>
+<li>对于AVL树而言，其中任何子树仍然是AVL树。</li>
+<li>每个节点的左右子节点的高度差的绝对值最多为1。</li>
+</ul>
+<p>在插入、删除树节点的时候，如果破坏了以上规则，AVL树会自动进行调整达到平衡。</p>
+<h4 id="1-2-1AVL的平衡调整"><a href="#1-2-1AVL的平衡调整" class="headerlink" title="1.2.1AVL的平衡调整"></a>1.2.1AVL的平衡调整</h4><p> 导致AVL失衡的四中情况：</p>
+<ul>
+<li>左左结构失衡（LL型失衡）</li>
+<li>右右结构失衡（RR型失衡）</li>
+<li>左右结构失衡（LR型失衡）</li>
+<li>右左结构失衡（RL型失衡）</li>
+</ul>
+<h5 id="LL型-右旋-："><a href="#LL型-右旋-：" class="headerlink" title="LL型(右旋)："></a>LL型(右旋)：</h5><p><code>场景：</code>当某节点的左子树的左子树插入新节点，导致该节点的平衡因子由1变为2。此时通过对该节点进行右旋操作恢复平衡。</p>
+<p>图中插入新节点 1 ，导致树失衡，此时以根节点 root 的左子节点为支点（pivot)，进行右旋，旋转完成后：</p>
+<ul>
+<li>pivot 成为新的根节点。</li>
+<li>原来的根节点 root 变为 pivot 的右子节点。</li>
+<li>pivot 原来的右子节点 6 变为 root 节点的左子节点。</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250402101009.png"></p>
+<p>右旋动画演示：</p>
+<img src="https://img-blog.csdnimg.cn/96a7aa160f13424abb4acd1ada47edbf.webp#pic_center" alt="在这里插入图片描述"  />
+
+<h5 id="RR型-左旋"><a href="#RR型-左旋" class="headerlink" title="RR型(左旋):"></a>RR型(左旋):</h5><p><code>场景：</code>在某节点的右子树的右子树上插入新节点，导致该节点的平衡因子由-1变为-2。此时通过对该节点进行左旋操作来恢复平衡。</p>
+<p>图中插入新节点 13 ，导致树失衡，此时以根节点 root 的右子节点为支点（pivot)，进行左旋，旋转完成后：</p>
+<ul>
+<li>pivot 成为新的根节点。</li>
+<li>原来的根节点 root 变为 pivot 的左子节点。</li>
+<li>pivot 原来的左子节点 9 变为 root 节点的右子节点。</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250402105558.png"></p>
+<p>左旋动画演示：</p>
+<p><img src="https://img-blog.csdnimg.cn/ba1adc2895cf4b1aaef2e7088d9f6a69.webp#pic_center" alt="在这里插入图片描述"></p>
+<h5 id="LR型-左旋-右旋"><a href="#LR型-左旋-右旋" class="headerlink" title="LR型(左旋+右旋):"></a>LR型(左旋+右旋):</h5><p><code>场景：</code>在某节点的左子树的右子树上插入新节点，导致该节点的平衡因子由1变为2。此时需要先对左子树进行左旋（RR旋转），然后对该节点进行右旋（LL旋转）来恢复平衡。</p>
+<p>如图插入新节点 7 ，导致树失衡，此时需要进行两次旋转，我们先对它的左子树进行一次左旋，此时以 root 为根节点的树比变为了LL型失衡，然后在进行一次右旋即可。</p>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250402111157.png"></p>
+<h5 id="RL型-右旋-左旋"><a href="#RL型-右旋-左旋" class="headerlink" title="RL型(右旋+左旋):"></a>RL型(右旋+左旋):</h5><p><code>场景：</code>在某节点的右子树的左子树上插入新节点，导致该节点的平衡因子由-1变为-2。此时需要先对右子树进行右旋（LL旋转），然后对该节点进行左旋（RR旋转）来恢复平衡。</p>
+<p>如图插入新节点 9 ，导致树失衡，此时需要进行两次旋转，我们先对它的右子树进行一次右旋，此时以 root 为根节点的树变为了RR型失衡，然后在进行一次左旋即可。</p>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250402113309.png"></p>
+<h4 id="1-2-2AVL树的问题"><a href="#1-2-2AVL树的问题" class="headerlink" title="1.2.2AVL树的问题"></a>1.2.2AVL树的问题</h4><p>平衡二叉树在插入或删除节点时，由于严格的平衡要求，频繁触发失衡调整（如多次旋转），导致大量的时间消耗在维护平衡上，效率低下，因此AVL树一般用于查询场景，而不是增加删除频繁的场景。</p>
+<p><strong>红黑树对于AVL的问题又做了相应的优化：</strong></p>
+<ul>
+<li><p><strong>继承自平衡优点</strong> ：保留了AVL树自平衡的特性，确保树的高度始终保持在O(log n)范围内，从而保证基本操作的时间复杂度。</p>
+</li>
+<li><p><strong>放宽平衡条件</strong> ：通过允许<strong>最长路径不超过最短路径两倍</strong>的“近似平衡”，减少了插入和删除时的旋转次数，提升了动态场景下的效率。</p>
+</li>
+<li><p><strong>适合频繁更新场景</strong> ：相比AVL树，红黑树在插入和删除操作中调整成本更低，<strong>更适合频繁增删的场景</strong>。</p>
+</li>
+</ul>
+<h2 id="2-红黑树概念"><a href="#2-红黑树概念" class="headerlink" title="2.红黑树概念"></a>2.红黑树概念</h2><h3 id="2-1-性质"><a href="#2-1-性质" class="headerlink" title="2.1.性质"></a>2.1.性质</h3><ul>
+<li><p><strong>节点是红色或黑色</strong>：每个节点都有一个颜色的属性，要么红色，要么黑色。</p>
+</li>
+<li><p><strong>根节点是黑色</strong>：树的根节点始终为黑色。</p>
+</li>
+<li><p><strong>叶子节点（NIL节点）是黑色</strong>：树的叶子节点，也就是树的边界节点，它们默认都为黑色。</p>
+</li>
+<li><p><strong>红色节点的子节点必须是黑色</strong>：如果一个节点是红色，则它的子节点必须是黑色（也就是说不能出现连续的红色节点）。</p>
+</li>
+<li><p><strong>从任意节点到其每个叶子节点的所有简单路径上，包含相同数量的黑色节点</strong>：这一性质称为“黑高”，确保了树的平衡性。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250330232454.png"></p>
+<p>基于上面这些性质，我们一般在插入红黑树节点的时候，会将这个节点设置为红色。原因是由于最后一条性质，<strong>红色破坏性质的可能性最小</strong>，如果是黑色，很可能导致这条支路的黑色节点比其他支路的要多，破坏平衡。</p>
+<h3 id="2-2-红黑树的节点结构"><a href="#2-2-红黑树的节点结构" class="headerlink" title="2.2.红黑树的节点结构"></a>2.2.红黑树的节点结构</h3><p>以HashMap中红黑树的实现为例。</p>
+<p><code>HashMap</code>中红黑树节点由<code>TreeNode</code>类表示，继承自<code>LinkedHashMap.Entry</code>，并增加了颜色标记和父子指针字段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">TreeNode</span>&lt;K,V&gt; <span class="keyword">extends</span> <span class="title class_">LinkedHashMap</span>.Entry&lt;K,V&gt; &#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; parent;  	<span class="comment">//父节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; left;		<span class="comment">//左子节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; right;	<span class="comment">//右子节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; prev;		<span class="comment">//前驱节点（用于双向链表），便于删除操作</span></span><br><span class="line">    <span class="type">boolean</span> red;  			<span class="comment">//颜色标记（true 表示红色，false 表示黑色）</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//构造方法</span></span><br><span class="line">    TreeNode(<span class="type">int</span> hash, K key, V val, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">        <span class="built_in">super</span>(hash, key, val, next);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//其他方法...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-红黑树插入节点"><a href="#3-红黑树插入节点" class="headerlink" title="3.红黑树插入节点"></a>3.红黑树插入节点</h2><p>在红黑树的插入操作中，新节点被插入后可能会破坏红黑树的性质，因此需要进行修复。以下是插入时可能遇到的几种情况及其处理方法：</p>
+<h3 id="3-1-插入的新节点是根节点"><a href="#3-1-插入的新节点是根节点" class="headerlink" title="3.1.插入的新节点是根节点"></a>3.1.插入的新节点是根节点</h3><p><code>场景：</code>树为空，新节点成为根节点。</p>
+<p><code>处理：</code>直接将根节点的颜色设置为黑色即可。（性质2：根节点必须是黑色）</p>
+<h3 id="3-2-新节点的父节点为黑色"><a href="#3-2-新节点的父节点为黑色" class="headerlink" title="3.2.新节点的父节点为黑色"></a>3.2.新节点的父节点为黑色</h3><p><code>场景：</code>新插入节点的父节点已经是黑色。</p>
+<p><code>处理：</code>无需任何操作，因为默认插入红色节点不会影响黑高或连续红色节点的规则。</p>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250420214938.png"></p>
+<h3 id="3-3-新节点的父节点为红色"><a href="#3-3-新节点的父节点为红色" class="headerlink" title="3.3.新节点的父节点为红色"></a>3.3.新节点的父节点为红色</h3><p>如果新节点的父节点为红色，那么该节点的父节点不可能为根节点，所以插入节点<strong>总存在祖父节点</strong>(三代关系)。由于性质四：红色节点的子节点必须是黑色。所以此时会出现两种情况：</p>
+<h4 id="叔叔节点为红色："><a href="#叔叔节点为红色：" class="headerlink" title="叔叔节点为红色："></a>叔叔节点为红色：</h4><p><code>场景：</code>父节点和叔叔节点均为红色。</p>
+<p><code>处理：</code></p>
+<ul>
+<li>将父节点和叔叔节点的颜色变为黑色。</li>
+<li>将祖父节点颜色变为红色。</li>
+<li>如果祖父为根，再将根变为黑色，如果祖父为非根，将祖父设置为当前节点在进行其他判断。</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250420222120.png"></p>
+<h4 id="叔叔节点为黑色："><a href="#叔叔节点为黑色：" class="headerlink" title="叔叔节点为黑色："></a>叔叔节点为黑色：</h4><p>如果叔叔节点是黑色，根据新节点的位置，分为以下四种旋转场景：</p>
+<p>（1）LL型</p>
+<p><code>场景：</code>新节点是父节点的左子节点，父节点是祖父节点的左子节点。</p>
+<p><code>处理：</code></p>
+<ul>
+<li><p>交换父节点和祖父节点的颜色（父节点变黑，祖父节点变红）。</p>
+</li>
+<li><p>对祖父节点进行右旋。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250420233655.png"></p>
+<p>（2）RR型</p>
+<p><code>场景：</code>新节点是父节点的右子节点，父节点是祖父节点的右子节点。</p>
+<p><code>处理：</code></p>
+<ul>
+<li><p>交换父节点和祖父节点的颜色（父节点变黑，祖父节点变红）。</p>
+</li>
+<li><p>对祖父节点进行左旋。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250421135408.png"></p>
+<p>（3）LR型</p>
+<p><code>场景：</code>新节点是父节点的右子节点，父节点是祖父节点的左子节点。</p>
+<p><code>处理：</code></p>
+<ul>
+<li>对父节点进行左旋，转换为LL型。</li>
+<li>按照LL型情况处理（1.变色 2.右旋 P节点）。</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250421142319.png"></p>
+<p>（4）RL型</p>
+<p><code>场景：</code>新节点是父节点的左子节点，父节点是祖父节点的右子节点。</p>
+<p><code>处理：</code></p>
+<ul>
+<li>对父节点进行右旋，转化为RR型。</li>
+<li>按照RR型情况处理（1.变色 2.左旋 P节点）。</li>
+</ul>
+<p><img src="https://gitee.com/Luyseon/blogimage/raw/master/img/20250421142400.png"></p>
+<h2 id="4-红黑树与AVL树区别"><a href="#4-红黑树与AVL树区别" class="headerlink" title="4.红黑树与AVL树区别"></a>4.红黑树与AVL树区别</h2><p><strong>1.平衡机制不同：</strong></p>
+<p>红黑树根据路径上<strong>黑色节点数目是否一致</strong>，来确认是否平衡，如果失衡，通过变色和旋转恢复平衡。</p>
+<p>AVL树根据树的<strong>平衡因子绝对值是否超过 1</strong>，来确认是否失衡，如果失衡，通过旋转来恢复。</p>
+<p><strong>2.红黑树插入与删除效率更高：</strong></p>
+<p>红黑树的非严格的平衡换取插入与删除节点时旋转的次数，<strong>任何不平衡都会在三次旋转以内解决</strong>。</p>
+<p>AVL树是严格的平衡树，在插入与删除节点时，根据不同情况，旋转的次数比红黑树要多，所以红黑树的插入效率更高。</p>
+<p><strong>3.适用性</strong></p>
+<p>AVL追求极致的查找性能，而红黑树在查询、插入和删除之间取得平衡，如果在你的应用中查找的次数远远大于插入和删除，选择AVL树，如果查询和插入删除次数差不多，那么选择红黑树更好。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://Lualvis.github.io">Luyseon</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://lualvis.github.io/2025/04/21/RB-Tree/">https://lualvis.github.io/2025/04/21/RB-Tree/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://Lualvis.github.io" target="_blank">Luyseon Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Tree/">Tree</a><a class="post-meta__tags" href="/tags/AVL/">AVL</a><a class="post-meta__tags" href="/tags/R-B-Tree/">R-B Tree</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="next-post pull-full" href="/2025/03/24/HashMap/" title="HashMap源码解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">HashMap源码解析</div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Luyseon</div><div class="author-info-description">记录易遗忘的知识</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Lualvis"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="toc-text">红黑树</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86"><span class="toc-text">1.前提知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-BST%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91"><span class="toc-text">1.1.BST二叉查找树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-AVL%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="toc-text">1.2.AVL平衡二叉树</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-1AVL%E7%9A%84%E5%B9%B3%E8%A1%A1%E8%B0%83%E6%95%B4"><span class="toc-text">1.2.1AVL的平衡调整</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#LL%E5%9E%8B-%E5%8F%B3%E6%97%8B-%EF%BC%9A"><span class="toc-text">LL型(右旋)：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RR%E5%9E%8B-%E5%B7%A6%E6%97%8B"><span class="toc-text">RR型(左旋):</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#LR%E5%9E%8B-%E5%B7%A6%E6%97%8B-%E5%8F%B3%E6%97%8B"><span class="toc-text">LR型(左旋+右旋):</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RL%E5%9E%8B-%E5%8F%B3%E6%97%8B-%E5%B7%A6%E6%97%8B"><span class="toc-text">RL型(右旋+左旋):</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-2AVL%E6%A0%91%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">1.2.2AVL树的问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%BA%A2%E9%BB%91%E6%A0%91%E6%A6%82%E5%BF%B5"><span class="toc-text">2.红黑树概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%80%A7%E8%B4%A8"><span class="toc-text">2.1.性质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E8%8A%82%E7%82%B9%E7%BB%93%E6%9E%84"><span class="toc-text">2.2.红黑树的节点结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%BA%A2%E9%BB%91%E6%A0%91%E6%8F%92%E5%85%A5%E8%8A%82%E7%82%B9"><span class="toc-text">3.红黑树插入节点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%8F%92%E5%85%A5%E7%9A%84%E6%96%B0%E8%8A%82%E7%82%B9%E6%98%AF%E6%A0%B9%E8%8A%82%E7%82%B9"><span class="toc-text">3.1.插入的新节点是根节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%96%B0%E8%8A%82%E7%82%B9%E7%9A%84%E7%88%B6%E8%8A%82%E7%82%B9%E4%B8%BA%E9%BB%91%E8%89%B2"><span class="toc-text">3.2.新节点的父节点为黑色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E6%96%B0%E8%8A%82%E7%82%B9%E7%9A%84%E7%88%B6%E8%8A%82%E7%82%B9%E4%B8%BA%E7%BA%A2%E8%89%B2"><span class="toc-text">3.3.新节点的父节点为红色</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%94%E5%8F%94%E8%8A%82%E7%82%B9%E4%B8%BA%E7%BA%A2%E8%89%B2%EF%BC%9A"><span class="toc-text">叔叔节点为红色：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%94%E5%8F%94%E8%8A%82%E7%82%B9%E4%B8%BA%E9%BB%91%E8%89%B2%EF%BC%9A"><span class="toc-text">叔叔节点为黑色：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%BA%A2%E9%BB%91%E6%A0%91%E4%B8%8EAVL%E6%A0%91%E5%8C%BA%E5%88%AB"><span class="toc-text">4.红黑树与AVL树区别</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/21/RB-Tree/" title="红黑树">红黑树</a><time datetime="2025-04-21T09:09:47.055Z" title="发表于 2025-04-21 17:09:47">2025-04-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/24/HashMap/" title="HashMap源码解析">HashMap源码解析</a><time datetime="2025-03-24T14:25:59.531Z" title="发表于 2025-03-24 22:25:59">2025-03-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/23/ArrayList/" title="ArrayList源码解析">ArrayList源码解析</a><time datetime="2025-03-22T16:19:39.008Z" title="发表于 2025-03-23 00:19:39">2025-03-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/18/JVM-Architecture/" title="JVM-体系结构">JVM-体系结构</a><time datetime="2025-03-18T03:27:27.331Z" title="发表于 2025-03-18 11:27:27">2025-03-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/12/RabbitMQ%20-%20%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/" title="RabbitMQ - 延迟队列">RabbitMQ - 延迟队列</a><time datetime="2025-03-12T13:56:47.516Z" title="发表于 2025-03-12 21:56:47">2025-03-12</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/banner.png);"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Luyseon</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
